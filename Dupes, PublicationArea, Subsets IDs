@@ -1,0 +1,49 @@
+#Предварительно изменила файл Publication Area, чтобы разделение между номером и area были через запятую для удобства импорта датасета. 
+#В данных Далибора есть проблема, которую и он сам не знаметил из-за маленького размера публикаций: area **'Public, Environmental & Occupational Health'** 
+#при импорте делится на две из-за запятой. Убрала эту запятую для нашего удобства. Проверила другие areas на эту проблему, общий лист: 
+- 'Public, Environmental & Occupational Health'
+- "Radiology, Nuclear Medicine & Medical Imaging",
+- "Dentistry, Oral Surgery & Medicine",
+- "Film, Radio & Television"
+
+№сделала то же самое. Удобнее убрать это различие сейчас, чем потом наткнуться на него где-то еще.
+
+
+PublicationArea <- read.csv("C:/Users/Dasha/YandexDisk/ANR-Lab General/Projects/WoS Russian Science/WoS Russia/Categories/PublicationArea/PublicationArea.txt", header=FALSE, quote="")
+length(unique(PublicationArea$V1)) 
+[1] 1383996
+# Количество уникальных WoS номеров не соотносится с количеством уникальных публикаций, либо публикаций больше, чем указано, 
+либо что-то не получилось вычистить, но проблема отличается от указанной выше
+
+#Create vocabulary object with duplicates 
+PA.dups <-rbind(PublicationArea,PublicationArea[73,],PublicationArea[73,],PublicationArea[300,]) 
+ 
+#List duplicates 
+dups <-PA.dups[duplicated(PA.dups$V1)|duplicated(PA.dups$V1, fromLast=TRUE),] 
+dups
+
+#Count duplicates by WoS numbers 
+table(dups$V1)
+```
+
+№ В итоге: дубликаты в базе данных есть, максимальное количество areas на один WoS number - 9. Список WoS numbers с количеством дубликатов: 
+[https://disk.yandex.ru/i/auw20QNvqLuwIg](https://disk.yandex.ru/i/auw20QNvqLuwIg)
+
+
+#Создаем сабсеты с WoS номерами по социологии и экономике
+> soc_subset <- subset(PublicationArea, V2=='Sociology')
+> econ_subset <- subset(PublicationArea, V2=='Business & Economics')
+```
+
+#Функция экспорта файла в формате для эксель
+write.csv(my_data, file = "my_data.csv")
+
+
+
+#Создадим датафрейм на основе нашей текстовой базы данных
+install.packages("bibliometrix")
+library(bibliometrix)
+CompleteDataBase <- c('CompleteWOSDataBase.txt')
+CompleteWOSDataBase <- convert2df(file = CompleteDataBase, dbsource = 'wos', format = "plaintext")
+
+№ Aria, M. & Cuccurullo, C. (2017) bibliometrix: An R-tool for comprehensive science mapping analysis, Journal of Informetrics, 11(4), pp 959-975, Elsevier.
